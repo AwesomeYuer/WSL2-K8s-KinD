@@ -71,8 +71,12 @@ ls $HOME/.kube
 
 ```
 # Create the cluster and give it a name (optional)
-kind create cluster --name wslkind
+# kind create cluster --name wslkind
+kind create cluster --name wsl2-kind-k8s-cluster01
 ```
+
+![kind create cluster](images/kind-create-cluster.png)
+
 
 ```
 # Check if the .kube has been created and populated with files
