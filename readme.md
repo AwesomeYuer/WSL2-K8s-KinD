@@ -128,3 +128,61 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.3/a
 # Check the resources it created based on the new namespace created
 kubectl get all -n kubernetes-dashboard
 ```
+
+```
+# Start a kubectl proxy
+kubectl proxy
+# Enter the URL on your browser: 
+# http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+```
+
+# Let's open a new WSL2 session:
+
+```
+# Create a new ServiceAccount
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+EOF
+# Create a ClusterRoleBinding for the ServiceAccount
+kubectl apply -f - <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+EOF
+```
+
+```
+# Get the Token for the ServiceAccount
+kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')
+# Copy the token and copy it into the Dashboard login and press "Sign in"
+```
+
+```
+user@YUER-P50:/mnt/c/Users/xiyueyu$ kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')
+Name:         admin-user-token-q8qbs
+Namespace:    kubernetes-dashboard
+Labels:       <none>
+Annotations:  kubernetes.io/service-account.name: admin-user
+              kubernetes.io/service-account.uid: bbe2a105-58cf-4ade-a826-77e58ca18b55
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:     1025 bytes
+namespace:  20 bytes
+token:      eyJhbGciOiJSUzI1NiIsImtpZCI6ImZJMmM0MjVOdEpmZWRlbkNRYS1xemMyeWxueG5FYXZiQ2RHWHFLUi1uRUUifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXE4cWJzIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJiYmUyYTEwNS01OGNmLTRhZGUtYTgyNi03N2U1OGNhMThiNTUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZXJuZXRlcy1kYXNoYm9hcmQ6YWRtaW4tdXNlciJ9.MsPYP-YvbmBOlQfh-pTyWWJA6dAHsDlh55bTTfFZLJV6fY0GlZCr2wh6XpZtvDjLZF4JAOjvXL9cQrk212jI9z-0TUZ1vEQBdDmAW0T849lT27HOSzQyZKN3ACYfKpErnMtUMoi5etl4wkJHFbrfLa0JpTIG2P3Lz-tsseZc7LKCfCY_RRQ1EIblEC44xaNDLx1b5BBr_vlpZ9jIcinhia2N2Cpod8BRcRyyP7GtUOKls_clrVNX8v3C0IM2KGii_m1zfevaUoyFEywdnd0JKx5rIr-UjbS4rDqfgszZSEEQfb9fC4J9QZwUPQRa538cbygSEkiExVpd8-wRszDrXg
+```
