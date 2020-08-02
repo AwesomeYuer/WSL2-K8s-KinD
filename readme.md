@@ -1,11 +1,13 @@
-# https://kubernetes.io/blog/2020/05/21/wsl-docker-kubernetes-on-the-windows-desktop/
+# WSL+Docker: Kubernetes on the Windows Desktop
+https://kubernetes.io/blog/2020/05/21/wsl-docker-kubernetes-on-the-windows-desktop/
 
-```
+
+```bash
 # Update the repositories and list of the packages available
 sudo apt update
 ```
 
-```
+```bash
 # Update the system based on the packages installed > the "-y" will approve the change automatically
 
 sudo list --upgradeable
@@ -13,17 +15,17 @@ sudo list --upgradeable
 sudo apt upgrade -y
 ```
 
-```
+```bash
 # Try to see if the docker cli and daemon are installed
 docker version
 ```
 
-```
+```bash
 # Try to see if the docker cli and daemon are installed
 docker version
 ```
 
-```
+```bash
 # Same for kubectl
 kubectl version
 ```
@@ -43,24 +45,24 @@ https://kind.sigs.k8s.io/docs/user/working-offline/
 
 
 
-```
+```bash
 # echo Linux
 echo $(uname)
 ```
 
-```
+```bash
 # Download the latest version of KinD
 # curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-$(uname)-amd64
 cd ~
 curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.8.1/kind-$(uname)-amd64
 ```
 
-```
+```bash
 # Make the binary executable
 chmod +x ./kind
 ```
 
-```
+```bash
 # Move the binary to your executable path
 sudo mv ./kind /usr/local/bin/
 ```
@@ -69,17 +71,17 @@ sudo mv ./kind /usr/local/bin/
 
 We are ready to create our first cluster:
 
-```
+```bash
 # Check if the KUBECONFIG is not set
 echo $KUBECONFIG
 ```
 
-```
+```bash
 # Check if the .kube directory is created > if not, no need to create it
 ls $HOME/.kube
 ```
 
-```
+```bash
 # Create the cluster and give it a name (optional)
 # kind create cluster --name wslkind
 kind create cluster --name wsl2-kind-k8s-cluster01
@@ -88,7 +90,7 @@ kind create cluster --name wsl2-kind-k8s-cluster01
 ![kind create cluster](images/kind-create-cluster.png)
 
 
-```
+```bash
 # Check if the .kube has been created and populated with files
 ls $HOME/.kube
 ```
@@ -98,12 +100,12 @@ ls $HOME/.kube
 
 Our first cluster was created and it's the "normal" one/single node cluster:
 
-```
+```bash
 # Check how many nodes it created
 kubectl get nodes
 ```
 
-```
+```bash
 # Check the services for the whole cluster
 kubectl get all --all-namespaces
 ```
@@ -118,18 +120,18 @@ For that, the Kubernetes Dashboard project has been created. The installation an
 
 https://github.com/kubernetes/dashboard/releases/tag/v2.0.3
 
-```
+```bash
 # Install the Dashboard application into our cluster
 # kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-rc6/aio/deploy/recommended.yaml
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.3/aio/deploy/recommended.yaml
 ```
 
-```
+```bash
 # Check the resources it created based on the new namespace created
 kubectl get all -n kubernetes-dashboard
 ```
 
-```
+```bash
 # Start a kubectl proxy
 kubectl proxy
 # Enter the URL on your browser: 
@@ -138,7 +140,7 @@ kubectl proxy
 
 # Let's open a new WSL2 session:
 
-```
+```bash
 # Create a new ServiceAccount
 kubectl apply -f - <<EOF
 apiVersion: v1
@@ -164,7 +166,7 @@ subjects:
 EOF
 ```
 
-```
+```bash
 # Get the Token for the ServiceAccount
 kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')
 # Copy the token and copy it into the Dashboard login and press "Sign in"
